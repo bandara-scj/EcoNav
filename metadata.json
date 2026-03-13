@@ -1,0 +1,7 @@
+{
+  "name": "Remix: Final Versions for EcoNavi : Global Sustainable Travel - LKGC - Push",
+  "description": "A sustainable travel agent specializing in carbon-neutral tourism worldwide. Features conversational AI for planning.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
