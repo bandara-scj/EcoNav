@@ -1,7 +1,7 @@
 
 ## 🧪 Reproducible Testing Instructions
 
-To help judges easily evaluate EcoNavigator, follow these steps to test the core multimodal and agentic features locally.
+To help evaluate EcoNavigator, follow these steps to test the core multimodal and agentic features locally.
 
 ### 1. Complete Environment Setup
 In addition to the Gemini API key, EcoNavigator integrates with external travel APIs. Ensure your `.env.local` file contains the following:
