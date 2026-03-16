@@ -11,7 +11,8 @@ export async function generateEcoItinerary(
   modeOfTravel: string,
   startDate: string,
   endDate: string,
-  accommodationPreference: string
+  accommodationPreference: string,
+  pastTravelChoices: string = ""
 ): Promise<EcoItinerary> {
   const prompt = `
     Role: You are "EcoNavigator," an advanced, multimodal sustainable travel agent specializing in carbon-neutral tourism.
@@ -24,6 +25,7 @@ export async function generateEcoItinerary(
     - Duration: ${duration} days
     - Dates of Travel: ${startDate} to ${endDate}
     - Interests/Regions: ${interests}
+    - Past Travel Choices: ${pastTravelChoices}
     - Mode of Travel: ${modeOfTravel}
     - Accommodation Preference: ${accommodationPreference}
     
@@ -37,7 +39,8 @@ export async function generateEcoItinerary(
     4. Eco-Friendly Attractions: Provide 3-4 top eco-friendly attractions or activities at the destination. For each, include a name, description, a sustainability highlight, coordinates, and a single-word 'image_keyword' (e.g., 'waterfall', 'forest', 'museum') to be used for fetching a placeholder image.
     5. Seasonal Events & Activities: Use Google Search to find real events, festivals, or seasonal activities happening in ${destination} specifically between ${startDate} and ${endDate}. Provide 2-3 suggestions.
     6. Current Events & Fact-Checking: Use Google Search to discuss current events, cite recent news, or fact-check information related to the destination and activities. Include this context in the description.
-    7. Tone: Encouraging, informative, and deeply knowledgeable about ${destination}'s geography and sustainable practices.
+    7. Alternative Destinations: Based on the user's interests (${interests}) and past travel choices (${pastTravelChoices}), suggest 2-3 alternative sustainable destinations worldwide that offer similar experiences but might have a lower carbon footprint or better sustainability practices.
+    8. Tone: Encouraging, informative, and deeply knowledgeable about ${destination}'s geography and sustainable practices.
   `;
 
   const response = await ai.models.generateContent({
@@ -60,6 +63,8 @@ export async function generateEcoItinerary(
               arrival_carbon_footprint_kg: { type: Type.NUMBER },
               mode_of_travel: { type: Type.STRING },
               accommodation_preference: { type: Type.STRING },
+              interests: { type: Type.STRING },
+              past_travel_choices: { type: Type.STRING },
             },
             required: [
               "origin",
@@ -212,6 +217,20 @@ export async function generateEcoItinerary(
                 type: { type: Type.STRING },
               },
               required: ["name", "date", "description", "type"],
+            },
+          },
+          alternative_destinations: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                country: { type: Type.STRING },
+                description: { type: Type.STRING },
+                reason_for_suggestion: { type: Type.STRING },
+                sustainability_highlight: { type: Type.STRING },
+              },
+              required: ["name", "country", "description", "reason_for_suggestion", "sustainability_highlight"],
             },
           },
         },

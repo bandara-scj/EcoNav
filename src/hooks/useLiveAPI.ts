@@ -4,7 +4,7 @@ import { GoogleGenAI, LiveServerMessage, Modality, Type } from '@google/genai';
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 interface UseLiveAPIProps {
-  onItineraryReady: (origin: string, destination: string, startDate: string, endDate: string, interests: string, modeOfTravel: string, accommodationPreference: string) => void;
+  onItineraryReady: (origin: string, destination: string, startDate: string, endDate: string, interests: string, modeOfTravel: string, accommodationPreference: string, pastTravelChoices: string) => void;
 }
 
 export function useLiveAPI({ onItineraryReady }: UseLiveAPIProps) {
@@ -161,7 +161,7 @@ export function useLiveAPI({ onItineraryReady }: UseLiveAPIProps) {
                 if (call.name === 'generateItinerary') {
                   const args = call.args as any;
                   if (args) {
-                    onItineraryReady(args.origin, args.destination, args.startDate, args.endDate, args.interests, args.modeOfTravel, args.accommodationPreference || 'Any Sustainable Accommodation');
+                    onItineraryReady(args.origin, args.destination, args.startDate, args.endDate, args.interests, args.modeOfTravel, args.accommodationPreference || 'Any Sustainable Accommodation', args.pastTravelChoices || '');
                     disconnect(); // Stop conversation once we have the info
                   }
                 }

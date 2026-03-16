@@ -7,6 +7,8 @@ export interface UserJourney {
   arrival_carbon_footprint_kg: number;
   mode_of_travel: string;
   accommodation_preference: string;
+  interests?: string;
+  past_travel_choices?: string;
 }
 
 export interface TotalTripMetrics {
@@ -75,6 +77,14 @@ export interface SeasonalEvent {
   type: string;
 }
 
+export interface AlternativeDestination {
+  name: string;
+  country: string;
+  description: string;
+  reason_for_suggestion: string;
+  sustainability_highlight: string;
+}
+
 export interface EcoItinerary {
   user_journey: UserJourney;
   total_trip_metrics: TotalTripMetrics;
@@ -83,4 +93,5 @@ export interface EcoItinerary {
   en_route_activities: EnRouteActivity[];
   eco_attractions: EcoAttraction[];
   seasonal_events: SeasonalEvent[];
+  alternative_destinations?: AlternativeDestination[];
 }

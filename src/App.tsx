@@ -92,6 +92,7 @@ export default function App() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [interests, setInterests] = useState("");
+  const [pastTravelChoices, setPastTravelChoices] = useState("");
   const [modeOfTravel, setModeOfTravel] = useState("");
   const [accommodationPreference, setAccommodationPreference] = useState("Any Sustainable Accommodation");
   const [loading, setLoading] = useState(false);
@@ -116,6 +117,8 @@ export default function App() {
             setDestination(parsed.user_journey.destination || "");
             setStartDate(parsed.user_journey.start_date || "");
             setEndDate(parsed.user_journey.end_date || "");
+            setInterests(parsed.user_journey.interests || "");
+            setPastTravelChoices(parsed.user_journey.past_travel_choices || "");
             setModeOfTravel(parsed.user_journey.mode_of_travel || "");
             setAccommodationPreference(parsed.user_journey.accommodation_preference || "Any Sustainable Accommodation");
           }
@@ -139,7 +142,7 @@ export default function App() {
     }
   };
 
-  const handleItineraryReady = (o: string, dest: string, sd: string, ed: string, i: string, m: string, accPref: string) => {
+  const handleItineraryReady = (o: string, dest: string, sd: string, ed: string, i: string, m: string, accPref: string, ptc: string) => {
     setOrigin(o);
     setDestination(dest);
     setStartDate(sd);
@@ -147,16 +150,17 @@ export default function App() {
     setInterests(i);
     setModeOfTravel(m);
     setAccommodationPreference(accPref);
+    setPastTravelChoices(ptc);
     
     // Auto-submit the form
-    generateItineraryFromData(o, dest, sd, ed, i, m, accPref);
+    generateItineraryFromData(o, dest, sd, ed, i, m, accPref, ptc);
   };
 
   const { connect, disconnect, isConnected, isConnecting, isSpeaking } = useLiveAPI({
     onItineraryReady: handleItineraryReady
   });
 
-  const generateItineraryFromData = async (o: string, dest: string, sd: string, ed: string, i: string, m: string, accPref: string) => {
+  const generateItineraryFromData = async (o: string, dest: string, sd: string, ed: string, i: string, m: string, accPref: string, ptc: string) => {
     setLoading(true);
     setError(null);
     try {
@@ -180,7 +184,7 @@ export default function App() {
         setEndDate(validEd);
       }
 
-      const result = await generateEcoItinerary(o, dest, durationDays, i, m, validSd, validEd, accPref);
+      const result = await generateEcoItinerary(o, dest, durationDays, i, m, validSd, validEd, accPref, ptc);
       setItinerary(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
@@ -191,7 +195,7 @@ export default function App() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    generateItineraryFromData(origin, destination, startDate, endDate, interests, modeOfTravel, accommodationPreference);
+    generateItineraryFromData(origin, destination, startDate, endDate, interests, modeOfTravel, accommodationPreference, pastTravelChoices);
   };
 
   return (
@@ -413,24 +417,46 @@ export default function App() {
                   </div>
                 </div>
 
-                <div>
-                  <label
-                    htmlFor="interests"
-                    className="block text-sm font-semibold text-stone-700 mb-2"
-                  >
-                    What are your interests?
-                  </label>
-                  <div className="relative">
-                    <Compass className="absolute left-3 top-4 w-5 h-5 text-stone-400" />
-                    <textarea
-                      id="interests"
-                      required
-                      value={interests}
-                      onChange={(e) => setInterests(e.target.value)}
-                      rows={3}
-                      className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none resize-none"
-                      placeholder="e.g., Wildlife, beaches, tea plantations, ancient ruins..."
-                    />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label
+                      htmlFor="interests"
+                      className="block text-sm font-semibold text-stone-700 mb-2"
+                    >
+                      What are your interests?
+                    </label>
+                    <div className="relative">
+                      <Compass className="absolute left-3 top-4 w-5 h-5 text-stone-400" />
+                      <textarea
+                        id="interests"
+                        required
+                        value={interests}
+                        onChange={(e) => setInterests(e.target.value)}
+                        rows={3}
+                        className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none resize-none"
+                        placeholder="e.g., Wildlife, beaches, tea plantations, ancient ruins..."
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="pastTravelChoices"
+                      className="block text-sm font-semibold text-stone-700 mb-2"
+                    >
+                      Past Travel Choices (Optional)
+                    </label>
+                    <div className="relative">
+                      <Globe className="absolute left-3 top-4 w-5 h-5 text-stone-400" />
+                      <textarea
+                        id="pastTravelChoices"
+                        value={pastTravelChoices}
+                        onChange={(e) => setPastTravelChoices(e.target.value)}
+                        rows={3}
+                        className="w-full pl-10 pr-4 py-3 bg-stone-50 border border-stone-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none resize-none"
+                        placeholder="e.g., I loved my trip to Iceland for the nature, but I want something warmer."
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -531,6 +557,36 @@ export default function App() {
                       </div>
                       <h4 className="text-lg font-bold text-stone-900 mb-2">{event.name}</h4>
                       <p className="text-sm text-stone-600">{event.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {itinerary.alternative_destinations && itinerary.alternative_destinations.length > 0 && (
+              <div className="mb-12">
+                <h3 className="text-2xl font-bold text-stone-900 mb-6 flex items-center gap-2">
+                  <Globe className="w-6 h-6 text-emerald-600" />
+                  Alternative Sustainable Destinations
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {itinerary.alternative_destinations.map((dest, index) => (
+                    <div key={index} className="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 hover:shadow-md transition-all">
+                      <h4 className="text-xl font-bold text-stone-900 mb-1">{dest.name}</h4>
+                      <p className="text-sm font-medium text-emerald-700 mb-3">{dest.country}</p>
+                      <p className="text-sm text-stone-600 mb-4">{dest.description}</p>
+                      <div className="bg-stone-50 rounded-xl p-3 border border-stone-100 mb-3">
+                        <p className="text-xs font-medium text-stone-700">
+                          <span className="font-bold uppercase tracking-wider text-[10px] block mb-1 opacity-80">Why we suggest this</span>
+                          {dest.reason_for_suggestion}
+                        </p>
+                      </div>
+                      <div className="bg-emerald-50 rounded-xl p-3 border border-emerald-100">
+                        <p className="text-xs font-medium text-emerald-800">
+                          <span className="font-bold uppercase tracking-wider text-[10px] block mb-1 opacity-80">Sustainability Highlight</span>
+                          {dest.sustainability_highlight}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
